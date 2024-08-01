@@ -1,0 +1,276 @@
+@import url('https://fonts.googleapis.com/css2?family=Grand+Hotel&display=swap');
+
+.brand-logo,h2{
+  font-family: "Grand Hotel", cursive;
+  size: 2 em;
+}
+
+.mycard {
+  margin-top: 50px;
+}
+
+.auth-card {
+  padding: 20px;
+  text-align: center;
+  max-width: 450px;
+  margin: 10px auto;
+}
+
+/* label underline focus color */
+.input-field input[type=text]:focus, input[type=email]:focus, input[type=password]:focus, input[type=text]:focus {
+  border-bottom: 1px solid #FE7624 !important;
+  box-shadow: 0 1px 0 0 #FE7624 !important;
+}
+
+.gallery {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+
+.item {
+  width: 30%;
+}
+
+.gallery img {
+  width: 190px;
+  height: 190px;
+}
+
+.home {
+  margin: 100px auto;
+}
+
+.home-card {
+  max-width: 600px;
+  height: max-content;
+  margin: 26px auto;
+}
+
+.auth-card h6 a {
+  color: rgb(90, 75, 75);
+}
+
+.toast {
+  top: 30px !important;
+  right: 20px !important;
+  left: auto !important;
+}
+
+.comments-section {
+  max-height: 105px;
+  overflow-y: auto;
+}
+
+.pro-name-home {
+  color: #883e3e;
+}
+
+.material-icons:hover {
+  cursor: pointer;
+}
+
+.user-det {
+  max-height: 80px;
+}
+
+.user-det h5 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0;
+}
+
+.user-det h5 img {
+  margin-right: 10px;
+  border-radius: 50%;
+}
+
+.user-det h5 .user-info {
+  display: flex;
+  align-items: center;
+}
+
+.user-det h5 .material-icons {
+  cursor: pointer;
+}
+
+.user-det h5 .user-info a {
+  color: #883e3e;
+}
+
+.posted-by  {
+    color: #883e3e !important;
+}
+
+.modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 50%;
+  left: 40%;
+  transform: translate(-50%, -50%);
+  width: 40%;
+  height: 50%;
+  background-color: rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.modal-content, .update-tab {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 500px;
+  width: 100%;
+ 
+}
+
+.modal-content li{
+  padding: 7px;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+.who-liked, .pointer {
+  cursor: pointer !important;
+}
+
+.user-list-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px; /* Optional: adds space between list items */
+}
+
+.user-pic {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin-right: 10px; /* Space between the image and the link */
+}
+
+.user-link {
+  text-decoration: none;
+  color: black; /* You can customize the link color */
+}
+
+.custom-file-button {
+  display: inline-block;
+  padding: 10px 10px;
+  color: #5D21D1;
+  background-color: transparent; /* Use 'transparent' instead of 'none' */
+  border: 2px dashed #5D21D1; /* Specify border width, style (dashed), and color */
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 14px;
+  text-align: center;
+}
+
+.custom-file-button:hover {
+  background-color: rgba(136, 62, 62, 0.1); /* Optional: Add a slight hover effect */
+}
+
+#select-pfp{
+  color: #5D21D1;
+  background-color: transparent !important; 
+  border: 2px dashed #5D21D1; 
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 14px;
+  text-align: center;
+}
+
+.parallel{
+  padding: 10px;
+}
+
+#create-input{
+  width: 450px;
+}
+
+.main-content {
+  margin-left: 250px; 
+  padding: 20px;
+}
+
+.vertical-nav-wrapper {
+  width: 250px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background-color: #FF7043; /* Adjust the color as needed */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 20px;
+  justify-content: space-between;
+  z-index: 1000;
+}
+
+.vertical-nav-wrapper .brand-logo {
+  font-size: 3em;
+  color: white;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.vertical-nav-list {
+  list-style-type: none;
+  padding-top: 100px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.vertical-nav-list li {
+  width: 100%;
+  margin: 10px 0;
+  text-align: center;
+}
+
+.vertical-nav-list li a{
+  color: white;
+  font-size: 1.2em;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* Align items to the start horizontally */
+  padding: 0px 60px; /* Add padding for better alignment */
+  width: 100%;
+  max-height: 50px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  outline: none;
+}
+
+.vertical-nav-list li a i,
+.vertical-nav-list li button i {
+  margin-right: 10px;
+}
+
+#logout{
+  margin-left: -30px;
+  margin-top: 100px;
+}
+
+.nav{
+  position: fixed;
+  height: 70px;
+  top: 0;
+  z-index: 1000;
+
+}
