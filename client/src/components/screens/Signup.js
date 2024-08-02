@@ -36,9 +36,6 @@ const Signup = () => {
   }
 
   const uploadFields =()=>{
-    if(!/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(email)){
-      return M.toast({html: 'Invalid Email', classes: "red darken-2"})
-     }
      fetch("/signup", {
        method: "POST",
        headers: {
@@ -82,7 +79,7 @@ const Signup = () => {
         <h2>Catstagram</h2>
         <input
           type="text"
-          placeholder="name"
+          placeholder="user name"
           value={name}
           onChange={(e) => setName(e.target.value)}
         />

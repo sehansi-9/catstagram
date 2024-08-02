@@ -130,5 +130,32 @@ router.put('/updatebio', requireLogin, async (req, res) => {
     }
 });
 
+router.put('/updatename', requireLogin, async (req, res) => {
+    try {
+        const existingUser = await User.findOne({ name: req.body.name });
+        if (existingUser && existingUser._id.toString() !== req.user._id.toString()) {
+            return res.status(422).json({ 
+                error: `"${req.body.name}" username is unavailable`, 
+                name: req.user.name 
+            });
+            
+        }
+        const updatedUser = await User.findByIdAndUpdate(
+            req.user._id,
+            { $set: { name: req.body.name } },
+            { new: true }
+        ).select("-password");
+
+        if (!updatedUser){
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        res.json({ name: updatedUser.name });
+    } catch (err) {
+        console.error("Error updating name:", err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
 
 module.exports = router;

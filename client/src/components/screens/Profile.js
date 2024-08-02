@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import { UserContext } from "../../App";
 import { Link } from "react-router-dom";
+import M from 'materialize-css';
 
 const Profile = () => {
   const [mypics, setPics] = useState([]);
@@ -11,6 +12,8 @@ const Profile = () => {
   const [showFollowersModal, setShowFollowersModal] = useState(false);
   const [showFollowingModal, setShowFollowingModal] = useState(false);
   const [bio, setBio] = useState("");
+  const [name, setName] = useState("");
+  const [error, setError] = useState("");
   const [showUpdateTab, setShowUpdateTab] = useState(false);
 
   useEffect(() => {
@@ -80,7 +83,7 @@ const Profile = () => {
     })
       .then((res) => res.json())
       .then((result) => {
-        // Update the bio in local storage and context
+
         localStorage.setItem(
           "user",
           JSON.stringify({ ...state, bio: result.bio })
@@ -90,10 +93,47 @@ const Profile = () => {
       .catch((err) => console.log(err));
   };
 
+  const updateName = () => {
+    fetch("/updatename", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer" + localStorage.getItem("jwt"),
+      },
+      body: JSON.stringify({
+        name: name, // Send the bio data to the backend
+      }),
+    })
+      .then((res) => res.json())
+      .then((result) => {
+
+        if (result.error) {
+          // If there's an error in the result, show a toast
+          M.toast({ html: result.error, classes: "red darken-2" });
+          // Reset the name to the current name
+          
+        }
+        // Update the bio in local storage and context
+        localStorage.setItem(
+          "user",
+          JSON.stringify({ ...state, name: result.name })
+        );
+        dispatch({ type: "UPDATENAME", payload: result.name });
+      })
+      .catch((err) => M.toast({html: err, classes: "red darken-2"}));
+  };
+
   const handleUpdate = () => {
+    if (name === "") {
+        setError("Name cannot be blank");
+        return;
+      }
+    else{
     updatePhoto(image); // Call the updatePhoto function to update the profile picture
     updateBio(); // Call the updateBio function to update the bio
+    updateName();
     setShowUpdateTab(false); // Close the update tab after updating
+  }  
   };
 
   const fetchFollowers = (userId) => {
@@ -151,6 +191,7 @@ const Profile = () => {
                 style={{ color: "#5D21D1 " }}
                 onClick={() => {
                     setBio(state.bio);
+                    setName(state.name)
                     setShowUpdateTab(true)}
                 }
               >
@@ -182,6 +223,18 @@ const Profile = () => {
           {/* Update Tab */}
           {showUpdateTab && (
             <div className="update-tab ">
+                {/* Update Name */}
+              <div>
+                <h6>Update User Name:</h6>
+                <input
+                  value={name}
+                  onChange={
+                    (e) => setName(e.target.value)}
+                  placeholder="name cannot be blank"
+                ></input>
+              </div>
+              
+
               {/* Update Profile Picture */}
               <div>
                 <h6>Update Profile Picture:</h6>
@@ -200,7 +253,7 @@ const Profile = () => {
               <div>
                 <h6>Update Bio:</h6>
                 <textarea
-                  rows="3"
+                  rows="4"
                   value={bio}
                   onChange={
                     (e) => setBio(e.target.value)}

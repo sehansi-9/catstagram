@@ -6,13 +6,11 @@ import M from 'materialize-css';
 const Login= ()=>{
   const {state, dispatch} =useContext(UserContext)
   const [password, setPassword] = useState("");
-  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const navigate = useNavigate();
 
   const PostData = () => {
-    if(!/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(email)){
-     return M.toast({html: 'Invalid Email', classes: "red darken-2"})
-    }
+    
     fetch("/signin", {
       method: "POST",
       headers: {
@@ -20,7 +18,7 @@ const Login= ()=>{
       },
       body: JSON.stringify({
         password: password,
-        email: email
+        name: name
       })
     })
     .then(res => res.json())
@@ -50,10 +48,10 @@ const Login= ()=>{
       <div className="card auth-card input-field ">
         <h2>Catstagram</h2>
         <input
-          type="email"
-          placeholder="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          type="text"
+          placeholder="user name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
         />
         <input
           type="password"
