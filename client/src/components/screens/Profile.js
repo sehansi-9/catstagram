@@ -129,12 +129,16 @@ const Profile = () => {
         return;
       }
     else{
-    updatePhoto(image); // Call the updatePhoto function to update the profile picture
+     // Call the updatePhoto function to update the profile picture
     updateBio(); // Call the updateBio function to update the bio
-    updateName();
+    
     setShowUpdateTab(false); // Close the update tab after updating
   }  
   };
+
+  const updateUN =() =>{
+    updateName();
+  }
 
   const fetchFollowers = (userId) => {
     fetch(`/followers/${userId}`, {
@@ -232,6 +236,12 @@ const Profile = () => {
                     (e) => setName(e.target.value)}
                   placeholder="name cannot be blank"
                 ></input>
+                <button
+                className="btn waves-effect waves-light deep-purple accent-4"
+                onClick={updateUN}
+              >
+                Check & Update
+              </button>
               </div>
               
 
@@ -266,7 +276,7 @@ const Profile = () => {
                 className="btn waves-effect waves-light deep-purple accent-4"
                 onClick={handleUpdate}
               >
-                Update
+                Done
               </button>
             </div>
           )}
