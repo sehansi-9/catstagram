@@ -41,13 +41,11 @@ const Routing =()=>{
   </Routes>
   )
 }
+const socket = io("http://localhost:5000")
+    console.log(socket)
 
 function App() {
   const [state, dispatch] = useReducer(reducer,initialState)
-  useEffect(()=>{
-    const socket = io("http://localhost:5000")
-    console.log(socket)
-  },[])
   return (
     <UserContext.Provider value={{state,dispatch}}>
     <BrowserRouter>
