@@ -37,8 +37,8 @@ const PostCard = ({
             <div className="card-content user-det">
                 <h5>
                     <div className="user-info">
-                        <img src={post.postedby.pic} style={{ width: "40px", height: "40px" }} alt="Post" />
-                        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", marginLeft: "10px" }}>
+                        <img src={post.postedby.pic} style={{marginTop:"-10px", width: "40px", height: "40px" }} alt="Post" />
+                        <div style={{ display: "flex", marginTop:"-5px", flexDirection: "column", alignItems: "flex-start", marginLeft: "10px" }}>
                             <Link to={post.postedby._id !== user._id ? "/profile/" + post.postedby._id : "/profile"}>
                                 {post.postedby.name}
                             </Link>
