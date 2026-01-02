@@ -2,7 +2,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import M from 'materialize-css';
-import { loadTensorFlow } from './loadTensorflow'; 
+import { loadTensorFlow } from './loadTensorflow';
+import { uploadImage } from '../../services/uploadService';
+import { createPost } from '../../services/postService';
 
 const CreatePost = () => {
   const [title, setTitle] = useState("");
@@ -15,30 +17,21 @@ const CreatePost = () => {
 
   useEffect(() => {
     if (url) {
-      fetch("/createpost", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer" + localStorage.getItem("jwt")
-        },
-        body: JSON.stringify({
-          title,
-          body,
-          pic: url
-        })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.error) {
-          M.toast({ html: data.error, classes: "red darken-2" });
-        } else {
-          M.toast({ html: "Posted!", classes: "green darken-2" });
-          navigate('/');
+      const submitPost = async () => {
+        try {
+          const data = await createPost({ title, body, pic: url });
+
+          if (data.error) {
+            M.toast({ html: data.error, classes: "red darken-2" });
+          } else {
+            M.toast({ html: "Posted!", classes: "green darken-2" });
+            navigate('/');
+          }
+        } catch (error) {
+          console.error('Error:', error);
         }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-      });
+      };
+      submitPost();
     }
   }, [url, navigate, title, body]);
 
@@ -57,22 +50,14 @@ const CreatePost = () => {
 
     detectObjects().then(hasCat => {
       if (hasCat) {
-        const data = new FormData();
-        data.append("file", image);
-        data.append("upload_preset", "insta-clone");
-        data.append("cloud_name", "sehansi");
-
-        fetch("https://api.cloudinary.com/v1_1/sehansi/image/upload", {
-          method: "POST",
-          body: data
-        })
-        .then(res => res.json())
-        .then(data => {
-          setUrl(data.url);
-        })
-        .catch(err => {
-          console.log(err);
-        });
+        uploadImage(image)
+          .then(imageUrl => {
+            setUrl(imageUrl);
+          })
+          .catch(err => {
+            console.log(err);
+            M.toast({ html: "Error uploading image", classes: "red darken-2" });
+          });
       } else {
         M.toast({ html: "No cat detected in the image", classes: "red darken-2" });
       }
@@ -94,7 +79,7 @@ const CreatePost = () => {
               .detect(img)
               .then((predictions) => {
                 console.log("Predictions: ", predictions);
-                setPredictions(predictions); 
+                setPredictions(predictions);
                 // Check if any prediction is a 'cat'
                 const hasCat = predictions.some(
                   (prediction) => prediction.class === "cat"
@@ -120,22 +105,22 @@ const CreatePost = () => {
 
   return (
     <div className="card input-field" style={{ margin: "150px auto", maxWidth: "500px", padding: "20px", textAlign: "center" }}>
-      <input 
-        type="text" 
-        placeholder="title" 
-        value={title} 
-        onChange={(e) => setTitle(e.target.value)} 
+      <input
+        type="text"
+        placeholder="title"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
         style={{ marginBottom: "15px" }}
       />
-      <input 
-        type="text" 
-        placeholder="body" 
-        value={body} 
-        onChange={(e) => setBody(e.target.value)} 
+      <input
+        type="text"
+        placeholder="body"
+        value={body}
+        onChange={(e) => setBody(e.target.value)}
         style={{ marginBottom: "15px" }}
       />
 
-      <div className="parallel">       
+      <div className="parallel">
         <input type="file" id="fileInput" onChange={handleFileChange} style={{ display: "none" }} />
         <label htmlFor="fileInput" id="create-input" className="file-path-wrapper custom-file-button">{fileName}</label>
       </div>

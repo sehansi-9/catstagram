@@ -1,76 +1,62 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from 'react-router-dom';
 import M from 'materialize-css';
+import { uploadImage } from '../../services/uploadService';
+import { signup } from '../../services/authService';
 
 const Signup = () => {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
-  const [image,setImage] = useState("")
-  const [url,setUrl] = useState(undefined)
-  useEffect(()=>{
-    if(url){
+  const [image, setImage] = useState("")
+  const [url, setUrl] = useState(undefined)
+  useEffect(() => {
+    if (url) {
       uploadFields()
     }
   }, [url])
   const navigate = useNavigate();
 
 
-  const uploadPic =()=>{
-    const data = new FormData();
-    data.append("file", image);
-    data.append("upload_preset", "insta-clone");
-    data.append("cloud_name", "sehansi");
-
-    fetch("https://api.cloudinary.com/v1_1/sehansi/image/upload", {
-      method: "POST",
-      body: data
-    })
-    .then(res => res.json())
-    .then(data => {
-      setUrl(data.url);
-    })
-    .catch(err => {
+  const uploadPic = async () => {
+    try {
+      const imageUrl = await uploadImage(image);
+      setUrl(imageUrl);
+    } catch (err) {
       console.log(err);
-    });
+      M.toast({ html: 'Error uploading image', classes: "red darken-2" });
+    }
   }
 
-  const uploadFields =()=>{
-     fetch("/signup", {
-       method: "POST",
-       headers: {
-         "Content-Type": "application/json"
-       },
-       body: JSON.stringify({
-         name: name,
-         password: password,
-         email: email,
-         pic : url
-       })
-     })
-     .then(res => res.json())
-     .then(data => {
-       console.log(data)
-       if (data.error) {
-         M.toast({html: data.error, classes: "red darken-2"});
-       } else {
-         M.toast({html: data.message, classes: "green darken-2"});
-         navigate('/login');
-       }
-     })
-     .catch(error => {
-       console.error('Error:', error);
-       M.toast({html: 'An error occurred', classes: "red darken-2"});
-     });
+  const uploadFields = async () => {
+    try {
+      const data = await signup({
+        name,
+        password,
+        email,
+        pic: url
+      });
+
+      if (data.error) {
+        M.toast({ html: data.error, classes: "red darken-2" });
+      } else {
+        M.toast({ html: data.message, classes: "green darken-2" });
+        navigate('/login');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      M.toast({ html: 'An error occurred', classes: "red darken-2" });
+    }
   }
+
   const PostData = () => {
-    if(image){
+    if (image) {
       uploadPic()
     }
-    else{
+    else {
       uploadFields()
     }
-    
+
   }
 
   return (
@@ -96,14 +82,14 @@ const Signup = () => {
           onChange={(e) => setPassword(e.target.value)}
         />
         <div className="file-field input-field">
-        <div className="btn deep-purple accent-4" id="select-pfp">
-          <span>Profile Picture</span>
-          <input type="file" onChange={(e) => setImage(e.target.files[0])} />
+          <div className="btn deep-purple accent-4" id="select-pfp">
+            <span>Profile Picture</span>
+            <input type="file" onChange={(e) => setImage(e.target.files[0])} />
+          </div>
+          <div className="file-path-wrapper">
+            <input className="file-path validate" type="text" />
+          </div>
         </div>
-        <div className="file-path-wrapper">
-          <input className="file-path validate" type="text" />
-        </div>
-      </div>
         <button className="btn waves-effect waves-light deep-purple accent-4"
           onClick={PostData}>
           SignUp

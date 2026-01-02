@@ -2,286 +2,171 @@ import React, { useEffect, useState, useContext } from "react";
 import { UserContext } from "../../App";
 import { Link } from "react-router-dom";
 import M from 'materialize-css';
+import { uploadImage } from '../../services/uploadService';
+import { getMyPosts } from '../../services/postService';
+import {
+  updateProfilePic,
+  updateBio,
+  updateName
+} from '../../services/userService';
+import ProfileHeader from '../ProfileHeader';
 
 const Profile = () => {
   const [mypics, setPics] = useState([]);
   const { state, dispatch } = useContext(UserContext);
   const [image, setImage] = useState("");
-  const [followers, setFollowers] = useState([]);
-  const [following, setFollowing] = useState([]);
-  const [showFollowersModal, setShowFollowersModal] = useState(false);
-  const [showFollowingModal, setShowFollowingModal] = useState(false);
   const [bio, setBio] = useState("");
   const [name, setName] = useState("");
-  const [error, setError] = useState("");
   const [showUpdateTab, setShowUpdateTab] = useState(false);
 
   useEffect(() => {
-    fetch("/myposts", {
-      headers: {
-        Authorization: "Bearer" + localStorage.getItem("jwt"),
-      },
-    })
-      .then((res) => res.json())
-      .then((result) => {
+    const fetchPosts = async () => {
+      try {
+        const result = await getMyPosts();
         setPics(result.mypost);
-      });
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchPosts();
   }, []);
 
   useEffect(() => {
     if (image) {
-      const data = new FormData();
-      data.append("file", image);
-      data.append("upload_preset", "insta-clone");
-      data.append("cloud_name", "sehansi");
-
-      fetch("https://api.cloudinary.com/v1_1/sehansi/image/upload", {
-        method: "POST",
-        body: data,
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          fetch("/updatepic", {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: "Bearer" + localStorage.getItem("jwt"),
-            },
-            body: JSON.stringify({
-              pic: data.url,
-            }),
-          })
-            .then((res) => res.json())
-            .then((result) => {
-              localStorage.setItem(
-                "user",
-                JSON.stringify({ ...state, pic: result.pic })
-              );
-              dispatch({ type: "UPDATEPIC", payload: result.pic });
-            });
-        })
-        .catch((err) => {
+      const updatePic = async () => {
+        try {
+          const url = await uploadImage(image);
+          const result = await updateProfilePic(url);
+          localStorage.setItem(
+            "user",
+            JSON.stringify({ ...state, pic: result.pic })
+          );
+          dispatch({ type: "UPDATEPIC", payload: result.pic });
+        } catch (err) {
           console.log(err);
-        });
+        }
+      };
+      updatePic();
     }
   }, [image]);
 
-  const updatePhoto = async (file) => {
+  const updatePhoto = (file) => {
     setImage(file);
   };
 
-  const updateBio = () => {
-    fetch("/updatebio", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer" + localStorage.getItem("jwt"),
-      },
-      body: JSON.stringify({
-        bio: bio, // Send the bio data to the backend
-      }),
-    })
-      .then((res) => res.json())
-      .then((result) => {
-
-        localStorage.setItem(
-          "user",
-          JSON.stringify({ ...state, bio: result.bio })
-        );
-        dispatch({ type: "UPDATEBIO", payload: result.bio });
-      })
-      .catch((err) => console.log(err));
+  const handleUpdateBio = async () => {
+    try {
+      const result = await updateBio(bio);
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ ...state, bio: result.bio })
+      );
+      dispatch({ type: "UPDATEBIO", payload: result.bio });
+    } catch (err) {
+      console.log(err);
+    }
   };
 
-  const updateName = () => {
-    fetch("/updatename", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer" + localStorage.getItem("jwt"),
-      },
-      body: JSON.stringify({
-        name: name, // Send the bio data to the backend
-      }),
-    })
-      .then((res) => res.json())
-      .then((result) => {
-
-        if (result.error) {
-          // If there's an error in the result, show a toast
-          M.toast({ html: result.error, classes: "red darken-2" });
-          // Reset the name to the current name
-          
-        }
-        // Update the bio in local storage and context
+  const handleUpdateName = async () => {
+    try {
+      const result = await updateName(name);
+      if (result.error) {
+        M.toast({ html: result.error, classes: "red darken-2" });
+      } else {
         localStorage.setItem(
           "user",
           JSON.stringify({ ...state, name: result.name })
         );
         dispatch({ type: "UPDATENAME", payload: result.name });
-      })
-      .catch((err) => M.toast({html: err, classes: "red darken-2"}));
+      }
+    } catch (err) {
+      M.toast({ html: err, classes: "red darken-2" });
+    }
   };
 
   const handleUpdate = () => {
     if (name === "") {
-        setError("Name cannot be blank");
-        return;
-      }
-    else{
-     // Call the updatePhoto function to update the profile picture
-    updateBio(); // Call the updateBio function to update the bio
-    
-    setShowUpdateTab(false); // Close the update tab after updating
-  }  
-  };
-
-  const updateUN =() =>{
-    updateName();
-  }
-
-  const fetchFollowers = (userId) => {
-    fetch(`/followers/${userId}`, {
-      headers: {
-        Authorization: "Bearer" + localStorage.getItem("jwt"),
-      },
-    })
-      .then((res) => res.json())
-      .then((result) => {
-        setFollowers(result.followers || []); // Ensure followers is an array
-        setShowFollowersModal(true);
-      })
-      .catch((err) => console.log(err));
-  };
-
-  const fetchFollowing = (userId) => {
-    fetch(`/following/${userId}`, {
-      headers: {
-        Authorization: "Bearer" + localStorage.getItem("jwt"),
-      },
-    })
-      .then((res) => res.json())
-      .then((result) => {
-        setFollowing(result.following || []); // Ensure following is an array
-        setShowFollowingModal(true);
-      })
-      .catch((err) => console.log(err));
+      M.toast({ html: "Name cannot be blank", classes: "red darken-2" });
+      return;
+    }
+    else {
+      handleUpdateName();
+      handleUpdateBio();
+      setShowUpdateTab(false);
+    }
   };
 
   return (
     <div style={{ maxWidth: "600px", margin: "100px auto" }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-around",
-          margin: "18px 0px",
-          borderBottom: "1px solid gray",
-        }}
-      >
-        <div>
-          <img
-            style={{ width: "160px", height: "160px", borderRadius: "80px" }}
-            src={state ? state.pic : "loading"}
-            alt="profile-pic"
-          />
-        </div>
+      {state && (
+        <ProfileHeader user={state} postsCount={mypics.length}>
+          {!showUpdateTab && (
+            <i
+              className="material-icons"
+              style={{ color: "#5D21D1 ", cursor: "pointer", marginLeft: "10px" }}
+              onClick={() => {
+                setBio(state.bio);
+                setName(state.name)
+                setShowUpdateTab(true)
+              }}
+            >
+              create
+            </i>
+          )}
+        </ProfileHeader>
+      )}
 
-        <div>
-          <h4>
-            {state ? state.name : "loading"}{" "}
-            {!showUpdateTab && (
-              <i
-                className="material-icons"
-                style={{ color: "#5D21D1 " }}
-                onClick={() => {
-                    setBio(state.bio);
-                    setName(state.name)
-                    setShowUpdateTab(true)}
-                }
-              >
-                create
-              </i>
-            )}
-          </h4>
-
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              width: "108%",
-            }}
-          >
-            <h6>
-              {mypics.length} post{mypics.length !== 1 && "s"}
-            </h6>
-            <h6 className="pointer" onClick={() => fetchFollowers(state?._id)}>
-              {state?.followers?.length || "0"} followers
-            </h6>
-            <h6 className="pointer" onClick={() => fetchFollowing(state?._id)}>
-              {state?.following?.length || "0"} following
-            </h6>
+      {/* Update Tab - kept here as specific to own profile */}
+      {showUpdateTab && (
+        <div className="update-tab " style={{ margin: "20px" }}>
+          <div>
+            <h6>Update User Name:</h6>
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="name cannot be blank"
+            ></input>
           </div>
 
-          <h6 className="current-bio">{state ? state.bio : "loading"}</h6>
+          <div>
+            <h6>Update Profile Picture:</h6>
+            <input
+              type="file"
+              id="fileInput"
+              onChange={(e) => updatePhoto(e.target.files[0])}
+              style={{ display: "none" }}
+            />
+            <label htmlFor="fileInput" className="custom-file-button">
+              CHOOSE PIC
+            </label>
+          </div>
 
-          {/* Update Tab */}
-          {showUpdateTab && (
-            <div className="update-tab ">
-                {/* Update Name */}
-              <div>
-                <h6>Update User Name:</h6>
-                <input
-                  value={name}
-                  onChange={
-                    (e) => setName(e.target.value)}
-                  placeholder="name cannot be blank"
-                ></input>
-                <button
-                className="btn waves-effect waves-light deep-purple accent-4"
-                onClick={updateUN}
-              >
-                Check & Update
-              </button>
-              </div>
-              
+          <div>
+            <h6>Update Bio:</h6>
+            <textarea
+              rows="4"
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              placeholder="Write something about yourself..."
+            ></textarea>
+          </div>
 
-              {/* Update Profile Picture */}
-              <div>
-                <h6>Update Profile Picture:</h6>
-                <input
-                  type="file"
-                  id="fileInput"
-                  onChange={(e) => updatePhoto(e.target.files[0])}
-                  style={{ display: "none" }}
-                />
-                <label for="fileInput" class="custom-file-button">
-                  CHOOSE PIC
-                </label>
-              </div>
-
-              {/* Update Bio */}
-              <div>
-                <h6>Update Bio:</h6>
-                <textarea
-                  rows="4"
-                  value={bio}
-                  onChange={
-                    (e) => setBio(e.target.value)}
-                  placeholder="Write something about yourself..."
-                ></textarea>
-              </div>
-
-              {/* Update Button */}
-              <button
-                className="btn waves-effect waves-light deep-purple accent-4"
-                onClick={handleUpdate}
-              >
-                Done
-              </button>
-            </div>
-          )}
+          <button
+            className="btn waves-effect waves-light deep-purple accent-4"
+            onClick={handleUpdate}
+            style={{ marginTop: "10px" }}
+          >
+            Done
+          </button>
+          <button
+            className="btn waves-effect waves-light red lighten-2"
+            onClick={() => setShowUpdateTab(false)}
+            style={{ marginTop: "10px", marginLeft: "10px" }}
+          >
+            Cancel
+          </button>
         </div>
-      </div>
+      )}
 
       <div className="gallery">
         {mypics.map((item) => (
@@ -295,68 +180,6 @@ const Profile = () => {
           </Link>
         ))}
       </div>
-
-      {showFollowersModal && (
-        <div className="modal">
-          <div className="modal-content">
-            <span
-              className="close"
-              onClick={() => setShowFollowersModal(false)}
-            >
-              &times;
-            </span>
-            <h4>Followers:</h4>
-            <ul>
-              {followers.map((user) => (
-                <li key={user._id} className="user-list-item">
-                  <img className="user-pic" src={user.pic} alt="User" />
-                  <Link
-                    className="user-link"
-                    to={
-                      user._id !== state._id
-                        ? "/profile/" + user._id
-                        : "/profile"
-                    }
-                  >
-                    {user.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
-
-      {showFollowingModal && (
-        <div className="modal">
-          <div className="modal-content">
-            <span
-              className="close"
-              onClick={() => setShowFollowingModal(false)}
-            >
-              &times;
-            </span>
-            <h4>Following:</h4>
-            <ul>
-              {following.map((user) => (
-                <li key={user._id} className="user-list-item">
-                  <img className="user-pic" src={user.pic} alt="User" />
-                  <Link
-                    className="user-link"
-                    to={
-                      user._id !== state._id
-                        ? "/profile/" + user._id
-                        : "/profile"
-                    }
-                  >
-                    {user.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React,{useEffect,createContext, useReducer, useContext} from "react";
+import React, { useEffect, createContext, useReducer, useContext } from "react";
 import './App.css'
 import NavBar from "./components/Navbar";
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
@@ -7,52 +7,53 @@ import Login from './components/screens/Login';
 import Profile from './components/screens/Profile';
 import Signup from './components/screens/Signup';
 import CreatePost from "./components/screens/CreatePost";
-import {reducer, initialState} from './reducers/userReducer'
+import { reducer, initialState } from './reducers/userReducer'
 import UserProfile from "./components/screens/UserProfile";
 import MyHome from "./components/screens/SubscribedUserPosts"
 import OnePost from "./components/screens/OnePost";
 import io from "socket.io-client";
+import { API_URL } from './config/api';
 
 export const UserContext = createContext()
 
 
-const Routing =()=>{
+const Routing = () => {
   const navigate = useNavigate();
-  const {state, dispatch} = useContext(UserContext)
-  useEffect(()=>{
-    const user =JSON.parse(localStorage.getItem("user"))
-    if(user){
-      dispatch({type:"USER", payload:user})
+  const { state, dispatch } = useContext(UserContext)
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"))
+    if (user) {
+      dispatch({ type: "USER", payload: user })
     }
-    else{
+    else {
       navigate("/login")
     }
-  },[])
-  return(
+  }, [])
+  return (
     <Routes>
-    <Route path="/" element={<Home />} />
-    <Route path="/login" element={<Login />} />
-    <Route exact path="/profile" element={<Profile />} />
-    <Route path="/signup" element={<Signup />} />
-    <Route path="/create" element={<CreatePost />} />
-    <Route path="/profile/:userid" element={<UserProfile />} />
-    <Route path="/myhome" element={<MyHome />} />
-    <Route path="/post/:id" element={<OnePost/>} />
-  </Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/login" element={<Login />} />
+      <Route exact path="/profile" element={<Profile />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/create" element={<CreatePost />} />
+      <Route path="/profile/:userid" element={<UserProfile />} />
+      <Route path="/myhome" element={<MyHome />} />
+      <Route path="/post/:id" element={<OnePost />} />
+    </Routes>
   )
 }
-const socket = io("http://localhost:5000")
-    console.log(socket)
+const socket = io(API_URL)
+console.log(socket)
 
 function App() {
-  const [state, dispatch] = useReducer(reducer,initialState)
+  const [state, dispatch] = useReducer(reducer, initialState)
   return (
-    <UserContext.Provider value={{state,dispatch}}>
-    <BrowserRouter>
-      <NavBar />
-      <Routing className="main-content"/>
-      
-    </BrowserRouter>
+    <UserContext.Provider value={{ state, dispatch }}>
+      <BrowserRouter>
+        <NavBar />
+        <Routing className="main-content" />
+
+      </BrowserRouter>
     </UserContext.Provider>
   );
 }
