@@ -22,9 +22,14 @@ const Routing = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"))
-    if (user) {
-      dispatch(login(user))
+    const userStr = localStorage.getItem("user");
+    if (userStr && userStr !== "undefined") {
+      try {
+        const user = JSON.parse(userStr);
+        dispatch(login(user));
+      } catch (e) {
+        console.error("Error parsing user from localStorage", e);
+      }
     }
     else {
       // Check if we are on a public route before redirecting
@@ -47,7 +52,15 @@ const Routing = () => {
     </Routes>
   )
 }
-const socket = io(API_URL)
+let socket;
+try {
+  const url = new URL(API_URL);
+  socket = io(url.origin, {
+    path: url.pathname === "/" ? "/socket.io" : `${url.pathname}/socket.io`.replace(/\/+/g, '/')
+  });
+} catch (e) {
+  socket = io(API_URL);
+}
 console.log(socket)
 
 function App() {
