@@ -1,7 +1,7 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const mongoose = require('mongoose');
-const requireLogin = require('../middleware/requireLogin');
+import mongoose from 'mongoose';
+import requireLogin from '../middleware/requireLogin.js';
 const Post = mongoose.model("Post");
 const User = mongoose.model("User");
 
@@ -28,17 +28,17 @@ router.put('/follow', requireLogin, (req, res) => {
     User.findByIdAndUpdate(req.body.followId, {
         $push: { followers: req.user._id }
     }, { new: true })
-    .then(result => {
-        return User.findByIdAndUpdate(req.user._id, {
-            $push: { following: req.body.followId }
-        }, { new: true }).select("-password"); 
-    })
-    .then(result => {
-        res.json(result);
-    })
-    .catch(err => {
-        res.status(422).json({ error: err.message });
-    });
+        .then(result => {
+            return User.findByIdAndUpdate(req.user._id, {
+                $push: { following: req.body.followId }
+            }, { new: true }).select("-password");
+        })
+        .then(result => {
+            res.json(result);
+        })
+        .catch(err => {
+            res.status(422).json({ error: err.message });
+        });
 });
 
 
@@ -46,17 +46,17 @@ router.put('/unfollow', requireLogin, (req, res) => {
     User.findByIdAndUpdate(req.body.unfollowId, {
         $pull: { followers: req.user._id }
     }, { new: true })
-    .then(result => {
-        return User.findByIdAndUpdate(req.user._id, {
-            $pull: { following: req.body.unfollowId }
-        }, { new: true }).select("-password");
-    })
-    .then(result => {
-        res.json(result);
-    })
-    .catch(err => {
-        res.status(422).json({ error: err.message });
-    });
+        .then(result => {
+            return User.findByIdAndUpdate(req.user._id, {
+                $pull: { following: req.body.unfollowId }
+            }, { new: true }).select("-password");
+        })
+        .then(result => {
+            res.json(result);
+        })
+        .catch(err => {
+            res.status(422).json({ error: err.message });
+        });
 });
 
 
@@ -134,11 +134,11 @@ router.put('/updatename', requireLogin, async (req, res) => {
     try {
         const existingUser = await User.findOne({ name: req.body.name });
         if (existingUser && existingUser._id.toString() !== req.user._id.toString()) {
-            return res.status(422).json({ 
-                error: `"${req.body.name}" username is unavailable`, 
-                name: req.user.name 
+            return res.status(422).json({
+                error: `"${req.body.name}" username is unavailable`,
+                name: req.user.name
             });
-            
+
         }
         const updatedUser = await User.findByIdAndUpdate(
             req.user._id,
@@ -146,7 +146,7 @@ router.put('/updatename', requireLogin, async (req, res) => {
             { new: true }
         ).select("-password");
 
-        if (!updatedUser){
+        if (!updatedUser) {
             return res.status(404).json({ error: "User not found" });
         }
 
@@ -158,4 +158,4 @@ router.put('/updatename', requireLogin, async (req, res) => {
 });
 
 
-module.exports = router;
+export default router;

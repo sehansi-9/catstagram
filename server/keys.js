@@ -1,7 +1,5 @@
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config();
 
-module.exports={
-    MONGOURI: process.env.MONGOURI,
-    JWT_SECRET: process.env.JWT_SECRET
-}
-
+export const MONGOURI = process.env.MONGOURI;
+export const JWT_SECRET = process.env.JWT_SECRET;

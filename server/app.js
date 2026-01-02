@@ -1,10 +1,16 @@
-const express = require('express');
+import express from 'express';
+import mongoose from 'mongoose';
+import { MONGOURI } from './keys.js';
+import cors from 'cors';
+import { Server } from 'socket.io';
+import './models/user.js';
+import './models/post.js';
+import authRoutes from './routes/auth.js';
+import postRoutes from './routes/post.js';
+import userRoutes from './routes/user.js';
+
 const app = express();
 const PORT = 5000;
-const mongoose = require('mongoose');
-const { MONGOURI } = require('./keys');
-const cors = require('cors');
-const { Server } = require('socket.io');
 
 // Middleware
 app.use(cors()); // Enable CORS for all routes
@@ -20,14 +26,11 @@ mongoose.connection.on('error', (err) => {
     console.log('error connecting', err);
 });
 
-// Models and Routes
-require('./models/user');
-require('./models/post');
 
 app.use(express.json()); // Middleware to parse JSON requests
-app.use(require('./routes/auth'));
-app.use(require('./routes/post'));
-app.use(require('./routes/user'));
+app.use(authRoutes);
+app.use(postRoutes);
+app.use(userRoutes);
 
 // Start the Express app
 const server = app.listen(PORT, () => {

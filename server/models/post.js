@@ -1,30 +1,30 @@
-const mongoose =require('mongoose')
-const {ObjectId}= mongoose.Schema.Types
+import mongoose from 'mongoose';
+const { ObjectId } = mongoose.Schema.Types
 const postSchema = new mongoose.Schema({
-    title:{
+    title: {
         type: String,
-        required:true
+        required: true
     },
-    body:{
+    body: {
         type: String,
-        required:true
+        required: true
     },
-    photo:{
+    photo: {
         type: String,
-        required:true
+        required: true
     },
 
-    likes:[{type:ObjectId, ref:"User"}],
+    likes: [{ type: ObjectId, ref: "User" }],
 
-    comments:[{
-        text:String,
-        postedby:{type:ObjectId,ref:"User"}
+    comments: [{
+        text: String,
+        postedby: { type: ObjectId, ref: "User" }
     }],
-    
-    postedby:{
+
+    postedby: {
         type: ObjectId,
-        ref:"User"
+        ref: "User"
     }
 })
 
-mongoose.model("Post",postSchema)
+mongoose.model("Post", postSchema)

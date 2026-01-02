@@ -1,14 +1,14 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const mongoose = require('mongoose');
-const requireLogin = require('../middleware/requireLogin');
+import mongoose from 'mongoose';
+import requireLogin from '../middleware/requireLogin.js';
 const Post = mongoose.model("Post");
 const User = mongoose.model("User");
 
 router.get('/allposts', requireLogin, (req, res) => {
     Post.find()
         .populate("postedby", "_id name pic")
-        .populate("comments.postedby","_id name")
+        .populate("comments.postedby", "_id name")
         .then(posts => {
             res.json({ posts: posts });
         })
@@ -33,9 +33,9 @@ router.get('/post/:id', requireLogin, (req, res) => {
 });
 
 router.get('/myhome', requireLogin, (req, res) => {
-    Post.find({postedby:{$in:req.user.following}})
+    Post.find({ postedby: { $in: req.user.following } })
         .populate("postedby", "_id name pic")
-        .populate("comments.postedby","_id name")
+        .populate("comments.postedby", "_id name")
         .then(posts => {
             res.json({ posts: posts });
         })
@@ -83,12 +83,12 @@ router.put('/like', requireLogin, (req, res) => {
         { $push: { likes: req.user._id } },
         { new: true }
     )
-    .then(result => {
-        res.json(result);
-    })
-    .catch(err => {
-        res.status(422).json({ error: err });
-    });
+        .then(result => {
+            res.json(result);
+        })
+        .catch(err => {
+            res.status(422).json({ error: err });
+        });
 });
 
 
@@ -98,32 +98,32 @@ router.put('/unlike', requireLogin, (req, res) => {
         { $pull: { likes: req.user._id } },
         { new: true }
     )
-    .then(result => {
-        res.json(result);
-    })
-    .catch(err => {
-        res.status(422).json({ error: err });
-    });
+        .then(result => {
+            res.json(result);
+        })
+        .catch(err => {
+            res.status(422).json({ error: err });
+        });
 });
 
 router.put('/comment', requireLogin, (req, res) => {
-    const comment={
-        text:req.body.text,
-        postedby:req.user._id
-    }
+    const comment = {
+        text: req.body.text,
+        postedby: req.user._id
+    };
     Post.findByIdAndUpdate(
         req.body.postId,
-        { $push: { comments: comment} },
+        { $push: { comments: comment } },
         { new: true }
     )
-    .populate("comments.postedby","_id name")
-    .populate("postedby", "_id name")
-    .then(result => {
-        res.json(result);
-    })
-    .catch(err => {
-        res.status(422).json({ error: err });
-    });
+        .populate("comments.postedby", "_id name")
+        .populate("postedby", "_id name")
+        .then(result => {
+            res.json(result);
+        })
+        .catch(err => {
+            res.status(422).json({ error: err });
+        });
 });
 
 router.delete('/deletepost/:postId', requireLogin, (req, res) => {
@@ -139,8 +139,8 @@ router.delete('/deletepost/:postId', requireLogin, (req, res) => {
                         console.log(err);
                         res.status(500).json({ error: "Failed to delete the post" });
                     });
-            } 
-        })
+            }
+        });
 });
 
 router.delete('/deletecomment/:postId/:commentId', requireLogin, (req, res) => {
@@ -176,4 +176,4 @@ router.get('/likedusers/:postId', requireLogin, (req, res) => {
 
 
 
-module.exports = router;
+export default router;
