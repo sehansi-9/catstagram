@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import M from 'materialize-css';
+import CatSVG from '../../cat-in-mailbox.svg';
 import { uploadImage } from '../../services/uploadService';
 import { getMyPosts } from '../../services/postService';
 import {
@@ -171,16 +172,23 @@ const Profile = () => {
       )}
 
       <div className="gallery">
-        {mypics.map((item) => (
-          <Link key={item._id} to={`/post/${item._id}`}>
-            <img
-              key={item._id}
-              className="item"
-              src={item.photo}
-              alt={item.title}
-            />
-          </Link>
-        ))}
+        {mypics.length === 0 ? (
+          <div style={{ textAlign: "center", width: "100%" }}>
+            <h5 style={{ marginTop: "10px", fontFamily: "Grand Hotel", fontSize: "2rem" }}>no posts yet</h5>
+            <img src={CatSVG} style={{ marginTop: "-60px", width: "300px", height: "300px", opacity: "0.5" }} alt="No posts" />
+          </div>
+        ) : (
+          mypics.map((item) => (
+            <Link key={item._id} to={`/post/${item._id}`}>
+              <img
+                key={item._id}
+                className="item"
+                src={item.photo}
+                alt={item.title}
+              />
+            </Link>
+          ))
+        )}
       </div>
     </div>
   );

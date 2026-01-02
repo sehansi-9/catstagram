@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { updateFollowing } from '../../redux/userSlice';
 import { useParams, Link } from "react-router-dom";
+import CatSVG from '../../cat-in-mailbox.svg';
 import {
     getUserProfile,
     followUser,
@@ -112,11 +113,18 @@ const UserProfile = () => {
                         )}
                     </ProfileHeader>
                     <div className="gallery">
-                        {userProfile.posts.map(item => (
-                            <Link key={item._id} to={`/post/${item._id}`}>
-                                <img className="item" key={item._id} src={item.photo} alt={item.title} />
-                            </Link>
-                        ))}
+                        {userProfile.posts.length === 0 ? (
+                            <div style={{ textAlign: "center", width: "100%" }}>
+                                <h5 style={{ marginTop: "10px", fontFamily: "Grand Hotel", fontSize: "2rem" }}>no posts yet</h5>
+                                <img src={CatSVG} style={{ marginTop: "-60px", width: "300px", height: "300px", opacity: "0.5" }} alt="No posts" />
+                            </div>
+                        ) : (
+                            userProfile.posts.map(item => (
+                                <Link key={item._id} to={`/post/${item._id}`}>
+                                    <img className="item" key={item._id} src={item.photo} alt={item.title} />
+                                </Link>
+                            ))
+                        )}
                     </div>
                 </div>
                 : <h2>Loading...</h2>}
@@ -125,4 +133,3 @@ const UserProfile = () => {
 };
 
 export default UserProfile;
-

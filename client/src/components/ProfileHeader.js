@@ -36,6 +36,7 @@ const ProfileHeader = ({ user, postsCount, children }) => {
                 display: "flex",
                 justifyContent: "space-around",
                 margin: "18px 0px",
+                paddingBottom: "18px",
                 borderBottom: "1px solid gray",
             }}>
                 <div>
