@@ -27,7 +27,7 @@ const NavBar = () => {
                 <button className="btn waves-effect waves-light deep-purple accent-4" id="logout"
                   onClick={() => {
                     localStorage.clear()
-                    dispatch({ type: "CLEAR" })
+                    dispatch(logout())
                     navigate('/login')
                   }}>
                   Logout
