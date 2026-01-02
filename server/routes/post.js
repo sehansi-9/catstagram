@@ -1,179 +1,138 @@
 import express from 'express';
 const router = express.Router();
-import mongoose from 'mongoose';
 import requireLogin from '../middleware/requireLogin.js';
-const Post = mongoose.model("Post");
-const User = mongoose.model("User");
+import {
+    getAllPosts,
+    getPostById,
+    getSubscribedPosts,
+    createNewPost,
+    getMyPosts,
+    likePost,
+    unlikePost,
+    addComment,
+    deletePost,
+    deleteComment,
+    getLikedUsers
+} from '../services/postService.js';
 
-router.get('/allposts', requireLogin, (req, res) => {
-    Post.find()
-        .populate("postedby", "_id name pic")
-        .populate("comments.postedby", "_id name")
-        .then(posts => {
-            res.json({ posts: posts });
-        })
-        .catch(err => {
-            console.log(err);
-        });
-});
-
-router.get('/post/:id', requireLogin, (req, res) => {
-    Post.findOne({ _id: req.params.id })
-        .populate("postedby", "_id name pic")
-        .populate("comments.postedby", "_id name")
-        .then(post => {
-            if (!post) {
-                return res.status(404).json({ error: "Post not found" });
-            }
-            res.json({ post });
-        })
-        .catch(err => {
-            res.status(422).json({ error: err.message });
-        });
-});
-
-router.get('/myhome', requireLogin, (req, res) => {
-    Post.find({ postedby: { $in: req.user.following } })
-        .populate("postedby", "_id name pic")
-        .populate("comments.postedby", "_id name")
-        .then(posts => {
-            res.json({ posts: posts });
-        })
-        .catch(err => {
-            console.log(err);
-        });
-});
-
-router.post('/createpost', requireLogin, (req, res) => {
-    const { title, body, pic } = req.body;
-    if (!title || !body || !pic) {
-        res.status(422).json({ error: "Please add all the fields" });
-        return;
+router.get('/allposts', requireLogin, async (req, res) => {
+    try {
+        const posts = await getAllPosts();
+        res.json({ posts });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: "Internal Server Error" });
     }
-    req.user.password = undefined;
-    const post = new Post({
-        title,
-        body,
-        photo: pic,
-        postedby: req.user,
-    });
-    post.save()
-        .then(result => {
-            res.json({ post: result });
-        })
-        .catch(err => {
-            console.log(err);
-        });
 });
 
-router.get('/myposts', requireLogin, (req, res) => {
-    Post.find({ postedby: req.user._id })
-        .populate("postedby", "_id name")
-        .then(mypost => {
-            res.json({ mypost: mypost });
-        })
-        .catch(err => {
-            console.log(err);
-        });
+router.get('/post/:id', requireLogin, async (req, res) => {
+    try {
+        const post = await getPostById(req.params.id);
+        res.json({ post });
+    } catch (err) {
+        if (err.message === "Post not found") {
+            return res.status(404).json({ error: err.message });
+        }
+        res.status(422).json({ error: err.message });
+    }
 });
 
-router.put('/like', requireLogin, (req, res) => {
-    Post.findByIdAndUpdate(
-        req.body.postId,
-        { $push: { likes: req.user._id } },
-        { new: true }
-    )
-        .then(result => {
-            res.json(result);
-        })
-        .catch(err => {
-            res.status(422).json({ error: err });
-        });
+router.get('/myhome', requireLogin, async (req, res) => {
+    try {
+        const posts = await getSubscribedPosts(req.user);
+        res.json({ posts });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
 });
 
-
-router.put('/unlike', requireLogin, (req, res) => {
-    Post.findByIdAndUpdate(
-        req.body.postId,
-        { $pull: { likes: req.user._id } },
-        { new: true }
-    )
-        .then(result => {
-            res.json(result);
-        })
-        .catch(err => {
-            res.status(422).json({ error: err });
-        });
+router.post('/createpost', requireLogin, async (req, res) => {
+    try {
+        const { title, body, pic } = req.body;
+        const result = await createNewPost(title, body, pic, req.user);
+        res.json({ post: result });
+    } catch (err) {
+        if (err.message === "Please add all the fields") {
+            return res.status(422).json({ error: err.message });
+        }
+        console.log(err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
 });
 
-router.put('/comment', requireLogin, (req, res) => {
-    const comment = {
-        text: req.body.text,
-        postedby: req.user._id
-    };
-    Post.findByIdAndUpdate(
-        req.body.postId,
-        { $push: { comments: comment } },
-        { new: true }
-    )
-        .populate("comments.postedby", "_id name")
-        .populate("postedby", "_id name")
-        .then(result => {
-            res.json(result);
-        })
-        .catch(err => {
-            res.status(422).json({ error: err });
-        });
+router.get('/myposts', requireLogin, async (req, res) => {
+    try {
+        const mypost = await getMyPosts(req.user._id);
+        res.json({ mypost });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
 });
 
-router.delete('/deletepost/:postId', requireLogin, (req, res) => {
-    Post.findOne({ _id: req.params.postId })
-        .populate("postedby", "_id")
-        .then(post => {
-            if (post.postedby._id.toString() === req.user._id.toString()) {
-                post.deleteOne()
-                    .then(() => {
-                        res.json({ _id: post._id }); // Explicitly send the post ID to the client
-                    })
-                    .catch(err => {
-                        console.log(err);
-                        res.status(500).json({ error: "Failed to delete the post" });
-                    });
-            }
-        });
+router.put('/like', requireLogin, async (req, res) => {
+    try {
+        const result = await likePost(req.body.postId, req.user._id);
+        res.json(result);
+    } catch (err) {
+        res.status(422).json({ error: err.message });
+    }
 });
 
-router.delete('/deletecomment/:postId/:commentId', requireLogin, (req, res) => {
-    Post.findByIdAndUpdate(
-        req.params.postId,
-        { $pull: { comments: { _id: req.params.commentId } } },
-        { new: true }
-    )
-        .populate("comments.postedby", "_id name")
-        .populate("postedby", "_id name")
-        .then(result => {
-            res.json(result);
-        })
-        .catch(err => {
-            console.log(err);
-        });
+router.put('/unlike', requireLogin, async (req, res) => {
+    try {
+        const result = await unlikePost(req.body.postId, req.user._id);
+        res.json(result);
+    } catch (err) {
+        res.status(422).json({ error: err.message });
+    }
 });
 
-router.get('/likedusers/:postId', requireLogin, (req, res) => {
-    Post.findById(req.params.postId)
-        .populate('likes', '_id name pic')
-        .then(post => {
-            if (!post) {
-                return res.status(404).json({ error: "Post not found" });
-            }
-            res.json({ likedUsers: post.likes });
-        })
-        .catch(err => {
-            console.log(err);
-            res.status(500).json({ error: "An error occurred while fetching liked users" });
-        });
+router.put('/comment', requireLogin, async (req, res) => {
+    try {
+        const result = await addComment(req.body.text, req.body.postId, req.user._id);
+        res.json(result);
+    } catch (err) {
+        res.status(422).json({ error: err.message });
+    }
 });
 
+router.delete('/deletepost/:postId', requireLogin, async (req, res) => {
+    try {
+        const post = await deletePost(req.params.postId, req.user._id);
+        res.json({ _id: post._id });
+    } catch (err) {
+        console.log(err);
+        if (err.message === "Unauthorized to delete this post") {
+            return res.status(401).json({ error: err.message });
+        }
+        res.status(500).json({ error: "Failed to delete the post" });
+    }
+});
 
+router.delete('/deletecomment/:postId/:commentId', requireLogin, async (req, res) => {
+    try {
+        const result = await deleteComment(req.params.postId, req.params.commentId);
+        res.json(result);
+    } catch (err) {
+        console.log(err);
+        res.status(422).json({ error: err.message });
+    }
+});
+
+router.get('/likedusers/:postId', requireLogin, async (req, res) => {
+    try {
+        const likedUsers = await getLikedUsers(req.params.postId);
+        res.json({ likedUsers });
+    } catch (err) {
+        console.log(err);
+        if (err.message === "Post not found") {
+            return res.status(404).json({ error: err.message });
+        }
+        res.status(500).json({ error: "An error occurred while fetching liked users" });
+    }
+});
 
 export default router;
+
