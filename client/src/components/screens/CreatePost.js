@@ -2,9 +2,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import M from 'materialize-css';
-import { loadTensorFlow } from './loadTensorflow';
 import { uploadImage } from '../../services/uploadService';
 import { createPost } from '../../services/postService';
+import useContentModeration from '../../hooks/useContentModeration';
 
 const CreatePost = () => {
   const [title, setTitle] = useState("");
@@ -12,8 +12,10 @@ const CreatePost = () => {
   const [image, setImage] = useState(null);
   const [url, setUrl] = useState("");
   const [fileName, setFileName] = useState("CHOOSE PIC");
-  const [predictions, setPredictions] = useState([]);
   const navigate = useNavigate();
+
+  // Use custom hook for AI moderation
+  const { detectObjects, predictions, isLoading } = useContentModeration();
 
   useEffect(() => {
     if (url) {
@@ -48,59 +50,26 @@ const CreatePost = () => {
       return;
     }
 
-    detectObjects().then(hasCat => {
-      if (hasCat) {
-        uploadImage(image)
-          .then(imageUrl => {
-            setUrl(imageUrl);
-          })
-          .catch(err => {
-            console.log(err);
-            M.toast({ html: "Error uploading image", classes: "red darken-2" });
-          });
-      } else {
-        M.toast({ html: "No cat detected in the image", classes: "red darken-2" });
-      }
-    }).catch(err => {
-      console.error('Error detecting objects:', err);
-    });
-  };
-
-  const detectObjects = () => {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.src = URL.createObjectURL(image);
-      img.crossOrigin = "anonymous"; // Ensure CORS settings allow reading the image
-      img.onload = () => {
-        console.log("Image loaded successfully");
-        loadTensorFlow()
-          .then((model) => {
-            model
-              .detect(img)
-              .then((predictions) => {
-                console.log("Predictions: ", predictions);
-                setPredictions(predictions);
-                // Check if any prediction is a 'cat'
-                const hasCat = predictions.some(
-                  (prediction) => prediction.class === "cat"
-                );
-                resolve(hasCat);
-              })
-              .catch((err) => {
-                console.error("Error during model detection:", err);
-                reject(err);
-              });
-          })
-          .catch((error) => {
-            console.error("Error loading TensorFlow or COCO-SSD model:", error);
-            reject(error);
-          });
-      };
-      img.onerror = (err) => {
-        console.error("Error loading image:", err);
-        reject(err);
-      };
-    });
+    // Use the hook to detect objects
+    detectObjects(image)
+      .then(hasCat => {
+        if (hasCat) {
+          uploadImage(image)
+            .then(imageUrl => {
+              setUrl(imageUrl);
+            })
+            .catch(err => {
+              console.log(err);
+              M.toast({ html: "Error uploading image", classes: "red darken-2" });
+            });
+        } else {
+          M.toast({ html: "No cat detected in the image", classes: "red darken-2" });
+        }
+      })
+      .catch(err => {
+        console.error('Error detecting objects:', err);
+        M.toast({ html: "Error checking image content", classes: "red darken-2" });
+      });
   };
 
   return (
@@ -126,7 +95,13 @@ const CreatePost = () => {
       </div>
 
       <div className="parallel">
-        <button className="btn waves-effect waves-light deep-purple accent-4" onClick={postDetails}>Post</button>
+        <button
+          className="btn waves-effect waves-light deep-purple accent-4"
+          onClick={postDetails}
+          disabled={isLoading}
+        >
+          {isLoading ? "Checking..." : "Post"}
+        </button>
         <h6>Please ensure you uplaod clear pictures with visible purr friends... Don't forget that AI can make mistakes too :P</h6>
       </div>
 
@@ -147,3 +122,4 @@ const CreatePost = () => {
 };
 
 export default CreatePost;
+

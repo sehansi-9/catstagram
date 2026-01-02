@@ -149,7 +149,17 @@ const PostList = ({ fetchPosts, emptyState }) => {
                             :
                             <i className="material-icons" style={{ color: "#FE7624 " }} onClick={() => handleLikePost(item._id)}>favorite_border</i>
                         }
-                        <h6 className="who-liked" onClick={() => handleFetchLikedUsers(item._id)}>{item.likes.length} likes</h6>
+                        <h6
+                            className="who-liked"
+                            style={{ cursor: item.likes.length > 0 ? "pointer" : "default" }}
+                            onClick={() => {
+                                if (item.likes.length > 0) {
+                                    handleFetchLikedUsers(item._id);
+                                }
+                            }}
+                        >
+                            {item.likes.length} likes
+                        </h6>
                         <h6>{item.title}</h6>
                         <p>{item.body}</p>
                         <div className="comments-section">

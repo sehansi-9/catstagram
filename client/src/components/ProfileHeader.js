@@ -58,10 +58,26 @@ const ProfileHeader = ({ user, postsCount, children }) => {
                         width: "108%",
                     }}>
                         <h6>{postsCount} post{postsCount !== 1 && "s"}</h6>
-                        <h6 className="pointer" onClick={handleFetchFollowers}>
+                        <h6
+                            className="pointer"
+                            style={{ cursor: user.followers && user.followers.length > 0 ? "pointer" : "default" }}
+                            onClick={() => {
+                                if (user.followers && user.followers.length > 0) {
+                                    handleFetchFollowers();
+                                }
+                            }}
+                        >
                             {user.followers ? user.followers.length : "0"} followers
                         </h6>
-                        <h6 className="pointer" onClick={handleFetchFollowing}>
+                        <h6
+                            className="pointer"
+                            style={{ cursor: user.following && user.following.length > 0 ? "pointer" : "default" }}
+                            onClick={() => {
+                                if (user.following && user.following.length > 0) {
+                                    handleFetchFollowing();
+                                }
+                            }}
+                        >
                             {user.following ? user.following.length : "0"} following
                         </h6>
                     </div>
