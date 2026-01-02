@@ -12,18 +12,23 @@ import userRoutes from './routes/user.js';
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+console.log('Attempting to start server on port:', PORT);
+
 // Middleware
 app.use(cors()); // Enable CORS for all routes
 
 // MongoDB Connection
-mongoose.connect(MONGOURI);
-
-mongoose.connection.on('connected', () => {
-    console.log('connected to mongo yeahhh');
-});
+if (!MONGOURI) {
+    console.error('CRITICAL ERROR: MONGOURI environment variable is not defined!');
+} else {
+    console.log('Connecting to MongoDB...');
+    mongoose.connect(MONGOURI)
+        .then(() => console.log('Successfully connected to MongoDB atlas'))
+        .catch(err => console.error('FAILED to connect to MongoDB:', err.message));
+}
 
 mongoose.connection.on('error', (err) => {
-    console.log('error connecting', err);
+    console.error('Mongoose connection error event:', err);
 });
 
 
