@@ -27,18 +27,23 @@ input[type=text]:focus {
 }
 
 .gallery {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  /* Space between images */
+  margin-top: 20px;
 }
 
 .item {
-  width: 30%;
+  width: 100%;
 }
 
 .gallery img {
-  width: 190px;
-  height: 190px;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1 / 1;
+  /* Helper for square images */
+  object-fit: cover;
 }
 
 .home {

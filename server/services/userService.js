@@ -7,7 +7,7 @@ export const getUserWithPosts = async (userId) => {
     if (!user) {
         throw new Error("User not found");
     }
-    const posts = await Post.find({ postedby: userId }).populate("postedby", "_id name");
+    const posts = await Post.find({ postedby: userId }).populate("postedby", "_id name").sort({ _id: -1 });
     return { user, posts };
 };
 

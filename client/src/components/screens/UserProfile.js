@@ -112,20 +112,20 @@ const UserProfile = () => {
                                 </button>
                         )}
                     </ProfileHeader>
-                    <div className="gallery">
-                        {userProfile.posts.length === 0 ? (
-                            <div style={{ textAlign: "center", width: "100%" }}>
-                                <h5 style={{ marginTop: "10px", fontFamily: "Grand Hotel", fontSize: "2rem" }}>no posts yet</h5>
-                                <img src={CatSVG} style={{ marginTop: "-60px", width: "300px", height: "300px", opacity: "0.5" }} alt="No posts" />
-                            </div>
-                        ) : (
-                            userProfile.posts.map(item => (
+                    {userProfile.posts.length === 0 ? (
+                        <div style={{ textAlign: "center", width: "100%" }}>
+                            <h5 style={{ marginTop: "10px", fontFamily: "Grand Hotel", fontSize: "2rem" }}>no posts yet</h5>
+                            <img src={CatSVG} style={{ marginTop: "-60px", width: "300px", height: "300px", opacity: "0.5" }} alt="No posts" />
+                        </div>
+                    ) : (
+                        <div className="gallery">
+                            {userProfile.posts.map(item => (
                                 <Link key={item._id} to={`/post/${item._id}`}>
                                     <img className="item" key={item._id} src={item.photo} alt={item.title} />
                                 </Link>
-                            ))
-                        )}
-                    </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
                 : <h2>Loading...</h2>}
         </>

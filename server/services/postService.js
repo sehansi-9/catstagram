@@ -4,7 +4,8 @@ const Post = mongoose.model("Post");
 export const getAllPosts = async () => {
     return await Post.find()
         .populate("postedby", "_id name pic")
-        .populate("comments.postedby", "_id name");
+        .populate("comments.postedby", "_id name")
+        .sort({ _id: -1 });
 };
 
 export const getPostById = async (id) => {
@@ -20,7 +21,8 @@ export const getPostById = async (id) => {
 export const getSubscribedPosts = async (user) => {
     return await Post.find({ postedby: { $in: user.following } })
         .populate("postedby", "_id name pic")
-        .populate("comments.postedby", "_id name");
+        .populate("comments.postedby", "_id name")
+        .sort({ _id: -1 });
 };
 
 export const createNewPost = async (title, body, pic, user) => {
@@ -39,7 +41,8 @@ export const createNewPost = async (title, body, pic, user) => {
 
 export const getMyPosts = async (userId) => {
     return await Post.find({ postedby: userId })
-        .populate("postedby", "_id name");
+        .populate("postedby", "_id name")
+        .sort({ _id: -1 });
 };
 
 export const likePost = async (postId, userId) => {

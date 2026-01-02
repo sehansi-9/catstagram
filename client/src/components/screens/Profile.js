@@ -171,14 +171,14 @@ const Profile = () => {
         </div>
       )}
 
-      <div className="gallery">
-        {mypics.length === 0 ? (
-          <div style={{ textAlign: "center", width: "100%" }}>
-            <h5 style={{ marginTop: "10px", fontFamily: "Grand Hotel", fontSize: "2rem" }}>no posts yet</h5>
-            <img src={CatSVG} style={{ marginTop: "-60px", width: "300px", height: "300px", opacity: "0.5" }} alt="No posts" />
-          </div>
-        ) : (
-          mypics.map((item) => (
+      {mypics.length === 0 ? (
+        <div style={{ textAlign: "center", width: "100%" }}>
+          <h5 style={{ marginTop: "10px", fontFamily: "Grand Hotel", fontSize: "2rem" }}>no posts yet</h5>
+          <img src={CatSVG} style={{ marginTop: "-60px", width: "300px", height: "300px", opacity: "0.5" }} alt="No posts" />
+        </div>
+      ) : (
+        <div className="gallery">
+          {mypics.map((item) => (
             <Link key={item._id} to={`/post/${item._id}`}>
               <img
                 key={item._id}
@@ -187,9 +187,9 @@ const Profile = () => {
                 alt={item.title}
               />
             </Link>
-          ))
-        )}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
