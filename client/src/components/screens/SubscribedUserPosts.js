@@ -1,4 +1,3 @@
-import React from "react";
 import PostList from '../PostList';
 import { getHomePosts } from '../../services/postService';
 import CatSVG from '../../cat-in-mailbox.svg';
