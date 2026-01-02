@@ -1,6 +1,4 @@
-/**
- * User Service - Handles user-related API calls
- */
+import { API_URL } from '../config/api';
 
 const getAuthHeaders = () => ({
     "Content-Type": "application/json",
@@ -13,7 +11,7 @@ const getAuthHeaders = () => ({
  * @returns {Promise<Object>} - User data and posts
  */
 export const getUserProfile = async (userId) => {
-    const response = await fetch(`/user/${userId}`, {
+    const response = await fetch(`${API_URL}/user/${userId}`, {
         headers: {
             Authorization: "Bearer" + localStorage.getItem("jwt")
         }
@@ -27,7 +25,7 @@ export const getUserProfile = async (userId) => {
  * @returns {Promise<Object>} - Updated user data
  */
 export const followUser = async (followId) => {
-    const response = await fetch('/follow', {
+    const response = await fetch(`${API_URL}/follow`, {
         method: "PUT",
         headers: getAuthHeaders(),
         body: JSON.stringify({ followId })
@@ -41,7 +39,7 @@ export const followUser = async (followId) => {
  * @returns {Promise<Object>} - Updated user data
  */
 export const unfollowUser = async (unfollowId) => {
-    const response = await fetch('/unfollow', {
+    const response = await fetch(`${API_URL}/unfollow`, {
         method: "PUT",
         headers: getAuthHeaders(),
         body: JSON.stringify({ unfollowId })
@@ -55,7 +53,7 @@ export const unfollowUser = async (unfollowId) => {
  * @returns {Promise<Object>} - Updated user data
  */
 export const updateProfilePic = async (pic) => {
-    const response = await fetch("/updatepic", {
+    const response = await fetch(`${API_URL}/updatepic`, {
         method: "PUT",
         headers: getAuthHeaders(),
         body: JSON.stringify({ pic })
@@ -69,7 +67,7 @@ export const updateProfilePic = async (pic) => {
  * @returns {Promise<Object>} - Updated bio
  */
 export const updateBio = async (bio) => {
-    const response = await fetch("/updatebio", {
+    const response = await fetch(`${API_URL}/updatebio`, {
         method: "PUT",
         headers: getAuthHeaders(),
         body: JSON.stringify({ bio })
@@ -83,7 +81,7 @@ export const updateBio = async (bio) => {
  * @returns {Promise<Object>} - Updated name or error
  */
 export const updateName = async (name) => {
-    const response = await fetch("/updatename", {
+    const response = await fetch(`${API_URL}/updatename`, {
         method: "PUT",
         headers: getAuthHeaders(),
         body: JSON.stringify({ name })
@@ -97,7 +95,7 @@ export const updateName = async (name) => {
  * @returns {Promise<Object>} - List of followers
  */
 export const getFollowers = async (userId) => {
-    const response = await fetch(`/followers/${userId}`, {
+    const response = await fetch(`${API_URL}/followers/${userId}`, {
         headers: {
             Authorization: "Bearer" + localStorage.getItem("jwt")
         }
@@ -111,7 +109,7 @@ export const getFollowers = async (userId) => {
  * @returns {Promise<Object>} - List of following
  */
 export const getFollowing = async (userId) => {
-    const response = await fetch(`/following/${userId}`, {
+    const response = await fetch(`${API_URL}/following/${userId}`, {
         headers: {
             Authorization: "Bearer" + localStorage.getItem("jwt")
         }

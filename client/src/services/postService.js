@@ -1,6 +1,4 @@
-/**
- * Post Service - Handles post-related API calls
- */
+import { API_URL } from '../config/api';
 
 const getAuthHeaders = () => ({
     "Content-Type": "application/json",
@@ -12,7 +10,7 @@ const getAuthHeaders = () => ({
  * @returns {Promise<Object>} - All posts
  */
 export const getAllPosts = async () => {
-    const response = await fetch('/allposts', {
+    const response = await fetch(`${API_URL}/allposts`, {
         headers: {
             Authorization: "Bearer" + localStorage.getItem("jwt")
         }
@@ -25,7 +23,7 @@ export const getAllPosts = async () => {
  * @returns {Promise<Object>} - Posts from followed users
  */
 export const getHomePosts = async () => {
-    const response = await fetch('/myhome', {
+    const response = await fetch(`${API_URL}/myhome`, {
         headers: {
             Authorization: "Bearer" + localStorage.getItem("jwt")
         }
@@ -38,7 +36,7 @@ export const getHomePosts = async () => {
  * @returns {Promise<Object>} - User's posts
  */
 export const getMyPosts = async () => {
-    const response = await fetch("/myposts", {
+    const response = await fetch(`${API_URL}/myposts`, {
         headers: {
             Authorization: "Bearer" + localStorage.getItem("jwt")
         }
@@ -52,7 +50,7 @@ export const getMyPosts = async () => {
  * @returns {Promise<Object>} - Post data
  */
 export const getPostById = async (postId) => {
-    const response = await fetch(`/post/${postId}`, {
+    const response = await fetch(`${API_URL}/post/${postId}`, {
         headers: {
             Authorization: "Bearer" + localStorage.getItem("jwt")
         }
@@ -69,7 +67,7 @@ export const getPostById = async (postId) => {
  * @returns {Promise<Object>} - Created post
  */
 export const createPost = async (postData) => {
-    const response = await fetch("/createpost", {
+    const response = await fetch(`${API_URL}/createpost`, {
         method: "POST",
         headers: getAuthHeaders(),
         body: JSON.stringify(postData)
@@ -83,7 +81,7 @@ export const createPost = async (postData) => {
  * @returns {Promise<Object>} - Updated post
  */
 export const likePost = async (postId) => {
-    const response = await fetch('/like', {
+    const response = await fetch(`${API_URL}/like`, {
         method: "PUT",
         headers: getAuthHeaders(),
         body: JSON.stringify({ postId })
@@ -97,7 +95,7 @@ export const likePost = async (postId) => {
  * @returns {Promise<Object>} - Updated post
  */
 export const unlikePost = async (postId) => {
-    const response = await fetch('/unlike', {
+    const response = await fetch(`${API_URL}/unlike`, {
         method: "PUT",
         headers: getAuthHeaders(),
         body: JSON.stringify({ postId })
@@ -112,7 +110,7 @@ export const unlikePost = async (postId) => {
  * @returns {Promise<Object>} - Updated post with comment
  */
 export const addComment = async (postId, text) => {
-    const response = await fetch('/comment', {
+    const response = await fetch(`${API_URL}/comment`, {
         method: "PUT",
         headers: getAuthHeaders(),
         body: JSON.stringify({ postId, text })
@@ -126,7 +124,7 @@ export const addComment = async (postId, text) => {
  * @returns {Promise<Object>} - Deleted post ID
  */
 export const deletePost = async (postId) => {
-    const response = await fetch(`/deletepost/${postId}`, {
+    const response = await fetch(`${API_URL}/deletepost/${postId}`, {
         method: "DELETE",
         headers: {
             Authorization: "Bearer" + localStorage.getItem("jwt")
@@ -142,7 +140,7 @@ export const deletePost = async (postId) => {
  * @returns {Promise<Object>} - Updated post
  */
 export const deleteComment = async (postId, commentId) => {
-    const response = await fetch(`/deletecomment/${postId}/${commentId}`, {
+    const response = await fetch(`${API_URL}/deletecomment/${postId}/${commentId}`, {
         method: "DELETE",
         headers: {
             Authorization: "Bearer" + localStorage.getItem("jwt")
@@ -157,7 +155,7 @@ export const deleteComment = async (postId, commentId) => {
  * @returns {Promise<Object>} - List of users who liked the post
  */
 export const getLikedUsers = async (postId) => {
-    const response = await fetch(`/likedusers/${postId}`, {
+    const response = await fetch(`${API_URL}/likedusers/${postId}`, {
         headers: {
             Authorization: "Bearer" + localStorage.getItem("jwt")
         }

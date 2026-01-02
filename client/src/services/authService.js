@@ -1,6 +1,4 @@
-/**
- * Auth Service - Handles authentication API calls
- */
+import { API_URL } from '../config/api';
 
 /**
  * Sign up a new user
@@ -12,7 +10,7 @@
  * @returns {Promise<Object>} - Response data
  */
 export const signup = async (userData) => {
-    const response = await fetch("/signup", {
+    const response = await fetch(`${API_URL}/signup`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -30,7 +28,7 @@ export const signup = async (userData) => {
  * @returns {Promise<Object>} - Response with token and user data
  */
 export const signin = async (credentials) => {
-    const response = await fetch("/signin", {
+    const response = await fetch(`${API_URL}/signin`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
