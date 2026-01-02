@@ -1,4 +1,4 @@
-import React, { useEffect, createContext, useReducer, useContext } from "react";
+import React, { useEffect } from "react";
 import './App.css'
 import NavBar from "./components/Navbar";
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
@@ -7,28 +7,33 @@ import Login from './components/screens/Login';
 import Profile from './components/screens/Profile';
 import Signup from './components/screens/Signup';
 import CreatePost from "./components/screens/CreatePost";
-import { reducer, initialState } from './reducers/userReducer'
 import UserProfile from "./components/screens/UserProfile";
 import MyHome from "./components/screens/SubscribedUserPosts"
 import OnePost from "./components/screens/OnePost";
 import io from "socket.io-client";
 import { API_URL } from './config/api';
-
-export const UserContext = createContext()
+import { Provider, useDispatch } from 'react-redux';
+import { store } from './redux/store';
+import { login } from './redux/userSlice';
 
 
 const Routing = () => {
   const navigate = useNavigate();
-  const { state, dispatch } = useContext(UserContext)
+  const dispatch = useDispatch();
+
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"))
     if (user) {
-      dispatch({ type: "USER", payload: user })
+      dispatch(login(user))
     }
     else {
-      navigate("/login")
+      // Check if we are on a public route before redirecting
+      const publicRoutes = ['/login', '/signup'];
+      if (!publicRoutes.includes(window.location.pathname)) {
+        navigate("/login")
+      }
     }
-  }, [])
+  }, [dispatch, navigate])
   return (
     <Routes>
       <Route path="/" element={<Home />} />
@@ -46,15 +51,13 @@ const socket = io(API_URL)
 console.log(socket)
 
 function App() {
-  const [state, dispatch] = useReducer(reducer, initialState)
   return (
-    <UserContext.Provider value={{ state, dispatch }}>
+    <Provider store={store}>
       <BrowserRouter>
         <NavBar />
         <Routing className="main-content" />
-
       </BrowserRouter>
-    </UserContext.Provider>
+    </Provider>
   );
 }
 

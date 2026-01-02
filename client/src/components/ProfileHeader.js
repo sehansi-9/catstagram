@@ -1,10 +1,10 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getFollowers, getFollowing } from '../services/userService';
-import { UserContext } from '../App';
+import { useSelector } from 'react-redux';
 
 const ProfileHeader = ({ user, postsCount, children }) => {
-    const { state } = useContext(UserContext);
+    const currentUser = useSelector((state) => state.user);
     const [followers, setFollowers] = useState([]);
     const [following, setFollowing] = useState([]);
     const [showFollowersModal, setShowFollowersModal] = useState(false);
@@ -97,7 +97,7 @@ const ProfileHeader = ({ user, postsCount, children }) => {
                                     <img className="user-pic" src={u.pic} alt="User" />
                                     <Link
                                         className="user-link"
-                                        to={u._id !== state?._id ? "/profile/" + u._id : "/profile"}
+                                        to={u._id !== currentUser?._id ? "/profile/" + u._id : "/profile"}
                                         onClick={() => setShowFollowersModal(false)}
                                     >
                                         {u.name}
@@ -120,7 +120,7 @@ const ProfileHeader = ({ user, postsCount, children }) => {
                                     <img className="user-pic" src={u.pic} alt="User" />
                                     <Link
                                         className="user-link"
-                                        to={u._id !== state?._id ? "/profile/" + u._id : "/profile"}
+                                        to={u._id !== currentUser?._id ? "/profile/" + u._id : "/profile"}
                                         onClick={() => setShowFollowingModal(false)}
                                     >
                                         {u.name}

@@ -1,5 +1,6 @@
-import React, { useEffect, useState, useContext } from "react";
-import { UserContext } from '../../App';
+import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from 'react-redux';
+import { updateFollowing } from '../../redux/userSlice';
 import { useParams, Link } from "react-router-dom";
 import {
     getUserProfile,
@@ -10,7 +11,8 @@ import ProfileHeader from '../ProfileHeader';
 
 const UserProfile = () => {
     const [userProfile, setProfile] = useState(null);
-    const { state, dispatch } = useContext(UserContext);
+    const state = useSelector((state) => state.user);
+    const dispatch = useDispatch();
     const { userid } = useParams();
     const [showFollow, setShowFollow] = useState(null);
     const [isProcessing, setIsProcessing] = useState(false);
@@ -38,7 +40,7 @@ const UserProfile = () => {
         setIsProcessing(true);
         try {
             const data = await followUser(userid);
-            dispatch({ type: "UPDATE", payload: { following: data.following, followers: data.followers } });
+            dispatch(updateFollowing({ following: data.following, followers: data.followers }));
             localStorage.setItem("user", JSON.stringify(data));
             setProfile((prevState) => {
                 return {
@@ -60,7 +62,7 @@ const UserProfile = () => {
         setIsProcessing(true);
         try {
             const data = await unfollowUser(userid);
-            dispatch({ type: "UPDATE", payload: { following: data.following, followers: data.followers } });
+            dispatch(updateFollowing({ following: data.following, followers: data.followers }));
             localStorage.setItem("user", JSON.stringify(data));
             setProfile((prevState) => {
                 const newFollowers = prevState.user.followers.filter(item => item !== data._id);

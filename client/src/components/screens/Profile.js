@@ -1,19 +1,21 @@
-import React, { useEffect, useState, useContext } from "react";
-import { UserContext } from "../../App";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import M from 'materialize-css';
 import { uploadImage } from '../../services/uploadService';
 import { getMyPosts } from '../../services/postService';
 import {
-  updateProfilePic,
-  updateBio,
-  updateName
+  updateProfilePic as updateProfilePicService,
+  updateBio as updateBioService,
+  updateName as updateNameService
 } from '../../services/userService';
 import ProfileHeader from '../ProfileHeader';
+import { useSelector, useDispatch } from 'react-redux';
+import { updatePic, updateBio, updateName } from '../../redux/userSlice';
 
 const Profile = () => {
   const [mypics, setPics] = useState([]);
-  const { state, dispatch } = useContext(UserContext);
+  const user = useSelector((state) => state.user);
+  const dispatch = useDispatch();
   const [image, setImage] = useState("");
   const [bio, setBio] = useState("");
   const [name, setName] = useState("");
@@ -33,22 +35,22 @@ const Profile = () => {
 
   useEffect(() => {
     if (image) {
-      const updatePic = async () => {
+      const updatePicAction = async () => {
         try {
           const url = await uploadImage(image);
-          const result = await updateProfilePic(url);
+          const result = await updateProfilePicService(url);
           localStorage.setItem(
             "user",
-            JSON.stringify({ ...state, pic: result.pic })
+            JSON.stringify({ ...user, pic: result.pic })
           );
-          dispatch({ type: "UPDATEPIC", payload: result.pic });
+          dispatch(updatePic(result.pic));
         } catch (err) {
           console.log(err);
         }
       };
-      updatePic();
+      updatePicAction();
     }
-  }, [image]);
+  }, [image, dispatch, user]);
 
   const updatePhoto = (file) => {
     setImage(file);
@@ -56,12 +58,12 @@ const Profile = () => {
 
   const handleUpdateBio = async () => {
     try {
-      const result = await updateBio(bio);
+      const result = await updateBioService(bio);
       localStorage.setItem(
         "user",
-        JSON.stringify({ ...state, bio: result.bio })
+        JSON.stringify({ ...user, bio: result.bio })
       );
-      dispatch({ type: "UPDATEBIO", payload: result.bio });
+      dispatch(updateBio(result.bio));
     } catch (err) {
       console.log(err);
     }
@@ -69,15 +71,15 @@ const Profile = () => {
 
   const handleUpdateName = async () => {
     try {
-      const result = await updateName(name);
+      const result = await updateNameService(name);
       if (result.error) {
         M.toast({ html: result.error, classes: "red darken-2" });
       } else {
         localStorage.setItem(
           "user",
-          JSON.stringify({ ...state, name: result.name })
+          JSON.stringify({ ...user, name: result.name })
         );
-        dispatch({ type: "UPDATENAME", payload: result.name });
+        dispatch(updateName(result.name));
       }
     } catch (err) {
       M.toast({ html: err, classes: "red darken-2" });
@@ -98,15 +100,15 @@ const Profile = () => {
 
   return (
     <div style={{ maxWidth: "600px", margin: "100px auto" }}>
-      {state && (
-        <ProfileHeader user={state} postsCount={mypics.length}>
+      {user && (
+        <ProfileHeader user={user} postsCount={mypics.length}>
           {!showUpdateTab && (
             <i
               className="material-icons"
               style={{ color: "#5D21D1 ", cursor: "pointer", marginLeft: "10px" }}
               onClick={() => {
-                setBio(state.bio);
-                setName(state.name)
+                setBio(user.bio);
+                setName(user.name)
                 setShowUpdateTab(true)
               }}
             >

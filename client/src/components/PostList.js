@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useContext } from "react";
-import { UserContext } from '../App';
+import React, { useState, useEffect } from "react";
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import {
     likePost,
     unlikePost,
@@ -12,7 +12,7 @@ import {
 
 const PostList = ({ fetchPosts, emptyState }) => {
     const [data, setData] = useState([]);
-    const { state } = useContext(UserContext);
+    const state = useSelector((state) => state.user);
     const [likedUsers, setLikedUsers] = useState([]);
     const [showModal, setShowModal] = useState(false);
 

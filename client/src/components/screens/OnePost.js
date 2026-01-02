@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useContext } from "react";
-import { UserContext } from '../../App';
+import React, { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 import {
     getPostById,
@@ -15,13 +15,11 @@ import {
 const OnePost = () => {
     const { id } = useParams();
     const [post, setPost] = useState(null);
-    const { state, dispatch } = useContext(UserContext);
+    const state = useSelector((state) => state.user);
     const [likedUsers, setLikedUsers] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [data, setData] = useState([]);
     const navigate = useNavigate();
-
-
 
     useEffect(() => {
         const fetchPost = async () => {
@@ -137,7 +135,17 @@ const OnePost = () => {
                         :
                         <i className="material-icons" style={{ color: "#FE7624 " }} onClick={() => handleLikePost(post._id)}>favorite_border</i>
                     }
-                    <h6 className="who-liked" onClick={() => handleFetchLikedUsers(post._id)}>{post.likes.length} likes</h6>
+                    <h6
+                        className="who-liked"
+                        style={{ cursor: post.likes.length > 0 ? "pointer" : "default" }}
+                        onClick={() => {
+                            if (post.likes.length > 0) {
+                                handleFetchLikedUsers(post._id);
+                            }
+                        }}
+                    >
+                        {post.likes.length} likes
+                    </h6>
                     <h6>{post.title}</h6>
                     <p>{post.body}</p>
                     <div className="comments-section">

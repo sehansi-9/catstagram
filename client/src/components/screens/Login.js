@@ -1,11 +1,12 @@
-import React, { useState, useContext } from "react";
-import { UserContext } from '../../App'
+import React, { useState } from "react";
 import { Link, useNavigate } from 'react-router-dom';
 import M from 'materialize-css';
 import { signin } from '../../services/authService';
+import { useDispatch } from 'react-redux';
+import { login } from '../../redux/userSlice';
 
 const Login = () => {
-  const { state, dispatch } = useContext(UserContext)
+  const dispatch = useDispatch();
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ const Login = () => {
       } else {
         localStorage.setItem("jwt", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
-        dispatch({ type: "USER", payload: data.user });
+        dispatch(login(data.user));
         M.toast({ html: "Logged in successfully", classes: "green darken-2" });
         navigate('/');
       }
