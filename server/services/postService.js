@@ -47,7 +47,8 @@ export const likePost = async (postId, userId) => {
         postId,
         { $push: { likes: userId } },
         { new: true }
-    );
+    ).populate("postedby", "_id name pic")
+        .populate("comments.postedby", "_id name");
 };
 
 export const unlikePost = async (postId, userId) => {
@@ -55,7 +56,8 @@ export const unlikePost = async (postId, userId) => {
         postId,
         { $pull: { likes: userId } },
         { new: true }
-    );
+    ).populate("postedby", "_id name pic")
+        .populate("comments.postedby", "_id name");
 };
 
 export const addComment = async (text, postId, userId) => {
@@ -69,7 +71,7 @@ export const addComment = async (text, postId, userId) => {
         { new: true }
     )
         .populate("comments.postedby", "_id name")
-        .populate("postedby", "_id name");
+        .populate("postedby", "_id name pic");
 };
 
 export const deletePost = async (postId, userId) => {
@@ -92,7 +94,7 @@ export const deleteComment = async (postId, commentId) => {
         { new: true }
     )
         .populate("comments.postedby", "_id name")
-        .populate("postedby", "_id name");
+        .populate("postedby", "_id name pic");
 };
 
 export const getLikedUsers = async (postId) => {
