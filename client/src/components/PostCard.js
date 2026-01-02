@@ -14,6 +14,7 @@ const PostCard = ({
     const user = useSelector((state) => state.user);
     const [likedUsers, setLikedUsers] = useState([]);
     const [showModal, setShowModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
 
     const handleFetchLikedUsers = async (postId) => {
         try {
@@ -41,7 +42,7 @@ const PostCard = ({
                         </Link>
                     </div>
                     {post.postedby._id === user._id &&
-                        <i className="material-icons" onClick={() => onDeletePost(post._id)}>delete</i>
+                        <i className="material-icons" onClick={() => setShowDeleteModal(true)} style={{ cursor: "pointer" }}>delete</i>
                     }
                 </h5>
             </div>
@@ -114,6 +115,21 @@ const PostCard = ({
                                 </li>
                             ))}
                         </ul>
+                    </div>
+                </div>
+            )}
+            {showDeleteModal && (
+                <div className="modal">
+                    <div className="modal-content" style={{ textAlign: "center" }}>
+                        <h4>Confirm Delete</h4>
+                        <p>Are you sure you want to delete this post?</p>
+                        <div style={{ display: "flex", justifyContent: "center", gap: "20px", marginTop: "20px" }}>
+                            <button className="btn red darken-3" onClick={() => {
+                                onDeletePost(post._id);
+                                setShowDeleteModal(false);
+                            }}>Delete</button>
+                            <button className="btn grey lighten-1" onClick={() => setShowDeleteModal(false)}>Cancel</button>
+                        </div>
                     </div>
                 </div>
             )}
